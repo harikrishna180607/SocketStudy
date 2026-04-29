@@ -80,69 +80,83 @@ Socket programming finds applications in various domains, including web developm
 ```
 import socket
 import threading
-import time 
+import time
 
+HOST = "127.0.0.1"
+PORT = 5002
+
+
+# -------------------- SERVER --------------------
 def server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("127.0.0.1", 5000))
+
+    # Allow reuse of same port
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    s.bind((HOST, PORT))
     s.listen(1)
-    print("Server waiting...")
+
+    print("Server is waiting for connection...")
 
     conn, addr = s.accept()
     print("Connected by:", addr)
 
-    while True:
-        data = conn.recv(1024)
-        msg = data.decode()
-        print("Client says:", msg)
+    count = 0
 
-        if msg.lower() == "exit":
+    while count < 3:
+        data = conn.recv(1024).decode()
+
+        if not data:
+            print("Client disconnected.")
             break
 
-        # Smart reply logic
-        msg_lower = msg.lower()
+        print("Client says:", data)
 
-        if "hello" in msg_lower or "hi" in msg_lower:
-            reply = "Hello! Nice to meet you."
-        
-        elif "my name is" in msg_lower or "i am" in msg_lower:
-            reply = "Nice to meet you! I am your server."
-        
-        elif "how are you" in msg_lower or "what about you" in msg_lower:
-            reply = "I am doing well. Thanks for asking!"
-        
-        elif "fine" in msg_lower:
-            reply = "Glad to hear that! How can I help you?"
-        
-        elif "bye" in msg_lower or "goodbye" in msg_lower:
-            reply = "Goodbye! Have a great day."
-        
-        else:
-            reply = "Can you please clarify?"
-
+        reply = input("Server reply: ")
         conn.send(reply.encode())
+
+        count += 1
+
+    print("Server is ending...")
+
+    conn.send("Server is end.".encode())
 
     conn.close()
     s.close()
 
+
+# -------------------- CLIENT --------------------
 def client():
-    time.sleep(1)
+    time.sleep(1)  # Wait for server to start
 
     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect(("127.0.0.1", 5000))
+
+    # Retry connection until server is ready
+    while True:
+        try:
+            c.connect((HOST, PORT))
+            print("Client connected to server.")
+            break
+        except ConnectionRefusedError:
+            print("Waiting for server...")
+            time.sleep(1)
 
     while True:
-        msg = input("Enter message from client: ")
-        c.send(msg.encode())
+        message = input("Client message: ")
+        c.send(message.encode())
 
-        if msg.lower() == "exit":
+        response = c.recv(1024).decode()
+
+        if response.lower() == "server is end.":
+            print(response)
             break
 
-        response = c.recv(1024)
-        print("Server says:", response.decode())
+        print("Server says:", response)
 
     c.close()
 
+
+# -------------------- THREADS --------------------
 server_thread = threading.Thread(target=server)
 client_thread = threading.Thread(target=client)
 
@@ -152,13 +166,13 @@ client_thread.start()
 server_thread.join()
 client_thread.join()
 
+print("Chat closed successfully.")
+
 
 ```
 
 ## OUTPUT IMAGE:
-
-<img width="1917" height="1073" alt="image" src="https://github.com/user-attachments/assets/ad7a2af4-80dc-4cd0-ad40-21e21040c136" />
-
+<img width="1916" height="1076" alt="image" src="https://github.com/user-attachments/assets/49660f98-50b9-4ece-a656-9818a5a919b8" />
 
 
 ## Example Use Cases:
