@@ -171,9 +171,6 @@ print("Chat closed successfully.")
 
 ```
 
-## OUTPUT IMAGE:
-<img width="1916" height="1076" alt="image" src="https://github.com/user-attachments/assets/49660f98-50b9-4ece-a656-9818a5a919b8" />
-
 
 ## Example Use Cases:
 
@@ -183,6 +180,8 @@ print("Chat closed successfully.")
 4.	Networked Games: Online multiplayer games rely on socket programming to facilitate communication between game clients and servers.
 5.	RPC mechanisms: which allow processes to execute code on a remote server, often use socket programming for communication.
 
+## OUTPUT IMAGE:
+<img width="1916" height="1076" alt="image" src="https://github.com/user-attachments/assets/49660f98-50b9-4ece-a656-9818a5a919b8" />
 
 ## Result:
 Thus the study of Socket Programming Completed Successfully
